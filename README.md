@@ -7,7 +7,7 @@ Welcome to my video player project VideoGenX
 ### I am
 
 - A Student
-- A Sront End Web Developer
+- A Front End Web Developer
 
 ## VideoGenX
 
