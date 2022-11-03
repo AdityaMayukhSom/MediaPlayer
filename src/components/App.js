@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 
 function App() {
+    const SECOND = 1;
+    const MINUTE = SECOND * 60;
+    const HOUR = MINUTE * 60;
     const timeRemainingShowNextEpisode = 10;
 
     const opacityNull = { opacity: 0, pointerEvents: "none", cursor: "none" };
@@ -11,7 +14,6 @@ function App() {
         { videoName: "Pasoori", videoURL: "./videos/Pasoori.mp4", subtitleURL: "./subtitle/Pasoori.vtt", posterURL: "./images/Pasoori.jpg" },
         { videoName: "Moon Knight", videoURL: "./videos/Moon.mp4", subtitleURL: "./subtitle/mySubtitle.vtt", posterURL: "./images/Moon Knight.jpg" },
         { videoName: "Komola", videoURL: "./videos/Komola.mp4", subtitleURL: "./subtitle/mySubtitle.vtt", posterURL: "./images/Pasoori.jpg" },
-        { videoName: "Star Trek Beyond", videoURL: "./videos/Star Trek Beyond 2016.mp4", subtitleURL: "./subtitle/Star Trek Beyond 2016.vtt", posterURL: "./images/Star Trek Beyond 2016.jpg" },
         { videoName: "O Je Mane Na Mana", videoURL: "./videos/ManeNaMana.mp4", subtitleURL: "./subtitle/mySubtitle.vtt", posterURL: "./images/Pasoori.jpg" },
         { videoName: "Thor Love And Thunder", videoURL: "./videos/Thor.mp4", subtitleURL: "./subtitle/mySubtitle.vtt", posterURL: "./images/Pasoori.jpg" },
         { videoName: "Ms. Marvel", videoURL: "./videos/Marvel.mp4", subtitleURL: "./subtitle/mySubtitle.vtt", posterURL: "./images/Pasoori.jpg" },
@@ -52,21 +54,11 @@ function App() {
 
     function convertHMS(value) {
         const sec = parseInt(value, 10); // convert value to number if it's string
-        var hours = Math.floor(sec / 3600);
-        var minutes = Math.floor((sec % 3600) / 60);
-        var seconds = Math.floor((sec % 3600) % 60);
-
-        if (hours < 10) {
-            hours = "0" + hours;
-        }
-        if (minutes < 10) {
-            minutes = "0" + minutes;
-        }
-        if (seconds < 10) {
-            seconds = "0" + seconds;
-        }
-        return hours + ":" + minutes + ":" + seconds; // Return is HH : MM : SS
-        // }
+        var hours = (sec / HOUR) | 0;
+        var minutes = ((sec - hours * HOUR) / MINUTE) | 0;
+        var seconds = sec - HOUR * hours - MINUTE * minutes;
+        // Return is HH : MM : SS
+        return `${hours >= 10 ? hours : `0${hours}`}:${minutes >= 10 ? minutes : `0${minutes}`}:${seconds >= 10 ? seconds : `0${seconds}`}`;
     }
 
     const incrementVideo = () => {
@@ -99,9 +91,8 @@ function App() {
     };
 
     const handleLoadedMetadata = () => {
-        const video = myVideo.current;
-        if (!video) return;
-        setTotalTiming(video.duration);
+        if (!myVideo.current) return;
+        setTotalTiming(myVideo.current.duration);
     };
 
     const togglePlaying = () => {
@@ -112,6 +103,7 @@ function App() {
             setCoverOpacity(opacityFull);
         } else {
             setIsPlaying(true);
+            getSubtitle();
             myVideo.current.play();
             timingID.current = setInterval(() => {
                 setVideoPlayingFor(convertHMS(myVideo.current.currentTime));
@@ -119,11 +111,7 @@ function App() {
         }
     };
     const toggleSettings = () => {
-        if (showSettings) {
-            setShowSettings(false);
-        } else {
-            setShowSettings(true);
-        }
+        setShowSettings(!showSettings);
     };
 
     const getFullScreenElement = (elem) => {
@@ -177,16 +165,12 @@ function App() {
     let timeoutTimer;
 
     useEffect(() => {
-        setProgressBarBaseWidth(myProgressBarBase.current.getBoundingClientRect().width);
-
         document.onmousemove = () => {
             setCoverOpacity(opacityFull);
-
             ResetTimers();
         };
         document.onmouseleave = () => {
             setCoverOpacity(opacityNull);
-
             clearTimeout(timeoutTimer);
         };
     }, [videoCover]);
@@ -303,27 +287,17 @@ function App() {
         removeOutline(speed100.current);
         removeOutline(speed125.current);
         removeOutline(speed150.current);
-
         currentPlaybackSpeedElement.current = speed100.current;
         previousPlaybackSpeedElement.current = speed100.current;
-
         setOutline(speed100.current);
     }, [videoNumber]);
 
     function handleLoop() {
-        if (isLoop) {
-            setIsLoop(false);
-        } else {
-            setIsLoop(true);
-        }
+        setIsLoop(!isLoop);
     }
 
     function handleSubtitle() {
-        if (isShowSubtitle) {
-            setIsShowSubtitle(false);
-        } else {
-            setIsShowSubtitle(true);
-        }
+        setIsShowSubtitle(!isShowSubtitle);
     }
 
     function handleProgressBarClick(e) {
@@ -343,7 +317,6 @@ function App() {
 
     useEffect(function setupListener() {
         function handleScrollDragging(e) {
-            // setTotalTiming(myVideo.current.duration);
             let position = e.clientX - myProgressBarBase.current.getBoundingClientRect().left;
             if (position > 0 && position < progressBarBaseWidth) {
                 myVideo.current.currentTime = (position / progressBarBaseWidth) * totalTiming;
@@ -365,49 +338,27 @@ function App() {
         });
     });
 
-    useEffect(function setupListener() {
-        function handleVolumeDragging(e) {
-            let position = e.clientX - myVolumeBar.current.getBoundingClientRect().left;
-            let volumeBarBaseWidth = myVolumeBar.current.getBoundingClientRect().width;
-            let temp = position / volumeBarBaseWidth;
-            if (temp > 0 && temp < 1) {
-                setVolumeFactor(position / volumeBarBaseWidth);
-            } else if (temp <= 0) {
-                setVolumeFactor(0);
-            } else {
-                setVolumeFactor(1);
-            }
+    window.onresize = () => {
+        if (myProgressBarBase.current) {
+            setProgressBarBaseWidth(myProgressBarBase.current.getBoundingClientRect().width);
         }
-        myVolumeBar.current.addEventListener("mousedown", () => {
-            handleDragging();
-        });
-
-        function handleDragging() {
-            document.addEventListener("mousemove", handleVolumeDragging);
-        }
-        document.addEventListener("mouseup", function () {
-            document.removeEventListener("mousemove", handleVolumeDragging);
-        });
-    });
+    };
 
     useEffect(() => {
-        //Code to check if to show Next Episode
+        if (myVideo.current) {
+            volumeSlider.current.style.marginLeft = volumeFactor * 100 - 6 + "px";
+            progressSlider.current.style.left = `${(myVideo.current.currentTime / totalTiming) * progressBarBaseWidth - 6}px`;
+            myProgressBar.current.style.width = `${(myVideo.current.currentTime / totalTiming) * progressBarBaseWidth}px`;
 
-        window.onresize = () => {
-            setProgressBarBaseWidth(myProgressBarBase.current.getBoundingClientRect().width);
-        };
-
-        volumeSlider.current.style.marginLeft = volumeFactor * 100 - 6 + "px";
-        progressSlider.current.style.left = `${(myVideo.current.currentTime / totalTiming) * progressBarBaseWidth - 6}px`;
-        myProgressBar.current.style.width = `${(myVideo.current.currentTime / totalTiming) * progressBarBaseWidth}px`;
-
-        if (totalTiming - myVideo.current.currentTime <= timeRemainingShowNextEpisode) {
-            setIsShowNextEpisode(true);
-        } else {
-            setIsShowNextEpisode(false);
+            if (totalTiming - myVideo.current.currentTime <= timeRemainingShowNextEpisode) {
+                setIsShowNextEpisode(true);
+            } else {
+                setIsShowNextEpisode(false);
+            }
         }
+    });
 
-        //Code for what to do after video ends
+    function handleVideoEnded() {
         myVideo.current.onended = () => {
             if (isAutoPlay) {
                 if (videoNumber < videoArray.length - 1) {
@@ -426,8 +377,7 @@ function App() {
                 setCoverOpacity(opacityFull);
             }
         };
-        getSubtitle();
-    });
+    }
 
     const [textTrack, setTextTrack] = useState(null);
 
@@ -435,7 +385,6 @@ function App() {
         if (!myVideo.current) return;
         let track = myVideo.current.textTracks[0];
         track.mode = "hidden";
-
         track.oncuechange = () => {
             if (track.activeCues.length) {
                 setTextTrack(track.activeCues[0].text);
@@ -455,7 +404,20 @@ function App() {
                 }}
             >
                 <div className="h-screen w-screen flex justify-center items-center overflow-hidden">
-                    <video loop={isLoop} width="auto" src={videoArray[videoNumber].videoURL} ref={myVideo} className="w-full h-full" id="myVideoID" onLoadedMetadata={handleLoadedMetadata} type="video/mp4" poster={videoArray[videoNumber].posterURL}>
+                    <video
+                        loop={isLoop}
+                        width="auto"
+                        src={videoArray[videoNumber].videoURL}
+                        ref={myVideo}
+                        className="w-full h-full"
+                        id="myVideoID"
+                        onLoadedMetadata={handleLoadedMetadata}
+                        type="video/mp4"
+                        poster={videoArray[videoNumber].posterURL}
+                        onEnded={() => {
+                            handleVideoEnded();
+                        }}
+                    >
                         <track label="English" kind="subtitles" srcLang="en" src={videoArray[videoNumber].subtitleURL} default />
                     </video>
                 </div>
@@ -783,10 +745,6 @@ function App() {
                                             onClick={() => handleSubtitle()}
                                         >
                                             <svg className="h-8 w-8" viewBox="0 0 24 24" title="Subtitles">
-                                                {/* <path
-                                                fill="#fff"
-                                                d="M18.75 4C20.5449 4 22 5.45507 22 7.25V16.7546C22 18.5495 20.5449 20.0046 18.75 20.0046H5.25C3.45507 20.0046 2 18.5495 2 16.7546V7.25C2 5.51697 3.35645 4.10075 5.06558 4.00514L5.25 4H18.75ZM18.75 5.5H5.25L5.10647 5.5058C4.20711 5.57881 3.5 6.33183 3.5 7.25V16.7546C3.5 17.7211 4.2835 18.5046 5.25 18.5046H18.75C19.7165 18.5046 20.5 17.7211 20.5 16.7546V7.25C20.5 6.2835 19.7165 5.5 18.75 5.5ZM5.5 12C5.5 8.85442 8.21322 7.22469 10.6216 8.59854C10.9814 8.80378 11.1067 9.26183 10.9015 9.62162C10.6962 9.98141 10.2382 10.1067 9.87838 9.90146C8.48071 9.10417 7 9.99357 7 12C7 14.0046 8.48411 14.8962 9.8792 14.1027C10.2392 13.8979 10.6971 14.0238 10.9019 14.3838C11.1067 14.7439 10.9809 15.2018 10.6208 15.4066C8.21539 16.7747 5.5 15.1433 5.5 12ZM13 12C13 8.85442 15.7132 7.22469 18.1216 8.59854C18.4814 8.80378 18.6067 9.26183 18.4015 9.62162C18.1962 9.98141 17.7382 10.1067 17.3784 9.90146C15.9807 9.10417 14.5 9.99357 14.5 12C14.5 14.0046 15.9841 14.8962 17.3792 14.1027C17.7392 13.8979 18.1971 14.0238 18.4019 14.3838C18.6067 14.7439 18.4809 15.2018 18.1208 15.4066C15.7154 16.7747 13 15.1433 13 12Z"
-                                            /> */}
                                                 {isShowSubtitle ? (
                                                     <path fill="#fff" d="M9.983 3v7.391c0 5.704-3.731 9.57-8.983 10.609l-.995-2.151c2.432-.917 3.995-3.638 3.995-5.849h-4v-10h9.983zm14.017 0v7.391c0 5.704-3.748 9.571-9 10.609l-.996-2.151c2.433-.917 3.996-3.638 3.996-5.849h-3.983v-10h9.983z" />
                                                 ) : (
