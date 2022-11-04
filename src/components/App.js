@@ -1,4 +1,6 @@
-import { Video } from './video';
+import { Subtitles } from './Subtitles';
+import { Title } from './Title';
+import { Video } from './Video';
 import React, { useEffect, useRef, useState } from "react";
 
 function App() {
@@ -17,7 +19,7 @@ function App() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [videoNumber, setVideoNumber] = useState(0);
-    const [videoPlayingFor, setVideoPlayingFor] = useState("00:00:00");
+    const [videoPlayingFor, setVideoPlayingFor] = useState("00:00:00");// eslint-disable-next-line
     const [totalTiming, setTotalTiming] = useState(0);
     const [coverOpacity, setCoverOpacity] = useState(opacityFull);
     const [fullScreenIcon, setFullScreenIcon] = useState(true);
@@ -401,15 +403,9 @@ function App() {
             >
                 <Video   isLoop={isLoop} myVideo={myVideo} handleLoadedMetadata={handleLoadedMetadata} handleVideoEnded={handleVideoEnded}  />
                 <div className="w-full h-full subtitleInside">
-                    {isShowSubtitle && (
-                        <pre className="w-screen absolute text-center text-white duration-500 text-lg sm:text-2xl md:text-3xl lg:text-5xl bottom-12 sm:bottom-0 sm:mb-16 transition-all  font-semibold tracking-wide pointer-events-none subtitle-font" id="subtitle" data-name="subtitle">
-                            {textTrack}
-                        </pre>
-                    )}
+                  <Subtitles   isShowSubtitle={isShowSubtitle} textTrack={textTrack}  />
                     <div className="h-full w-[100%] top-0 absolute z-10 opacity-100 transition-all bg-gradient-to-b from-black via-[#0000008a] to-black bg-opacity-[0.4] duration-500 coverShadow overflow-hidden " style={coverOpacity} ref={videoCover}>
-                        <div title="videoTitle" className="absolute w-full z-20 text-white text-4xl  sm:text-5xl md:text-7xl pt-10 pl-10 font-bold -mt-28 transition-all duration-700 videoTitle tracking-wide drop-shadow-lg">
-                            {videoArray[videoNumber].videoName}
-                        </div>
+                        <Title     /> 
 
                         <div className="h-full w-full absolute z-20 flex justify-center items-center select-none ">
                             <div
