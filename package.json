@@ -1,56 +1,30 @@
 {
-    "name": "videoplayer",
-    "version": "2.0.1",
-    "private": true,
-    "homepage": "./",
-    "main": "./main.js",
-    "dependencies": {
-        "@testing-library/jest-dom": "^5.16.4",
-        "@testing-library/react": "^13.2.0",
-        "@testing-library/user-event": "^13.5.0",
-        "autoprefixer": "^10.4.7",
-        "babel-loader": "^8.2.5",
-        "electron": "^18.2.4",
-        "postcss": "^8.4.14",
-        "react": "^18.1.0",
-        "react-dom": "^18.1.0",
-        "react-scripts": "5.0.1",
-        "tailwindcss": "^3.0.24",
-        "web-vitals": "^2.1.4"
-    },
-    "scripts": {
-        "start": "react-scripts start",
-        "build": "react-scripts build",
-        "test": "react-scripts test",
-        "eject": "react-scripts eject",
-        "watch": "webpack --config webpack.common.js --watch",
-        "electron": "electron ."
-    },
-    "eslintConfig": {
-        "extends": [
-            "react-app",
-            "react-app/jest"
-        ]
-    },
-    "browserslist": {
-        "production": [
-            ">0.2%",
-            "not dead",
-            "not op_mini all"
-        ],
-        "development": [
-            "last 1 chrome version",
-            "last 1 firefox version",
-            "last 1 safari version"
-        ]
-    },
-    "devDependencies": {
-        "@babel/core": "^7.18.0",
-        "@babel/preset-env": "^7.18.0",
-        "@babel/preset-react": "^7.17.12",
-        "css-loader": "^6.7.1",
-        "style-loader": "^3.3.1",
-        "webpack": "^5.72.1",
-        "webpack-cli": "^4.9.2"
-    }
+  "name": "streamwave",
+  "private": true,
+  "version": "0.0.3",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.25",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^3.3.3"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "@typescript-eslint/parser": "^5.61.0",
+    "@vitejs/plugin-react-swc": "^3.3.2",
+    "eslint": "^8.44.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.1",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.0"
+  }
 }
