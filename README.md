@@ -43,10 +43,10 @@ npm install
 4. Start the application:
 
 ```bash
-npm run start
+npm run dev
 ```
 
-5. Open your web browser and visit `http://localhost:3000` to access Sincho.
+5. Open your web browser and visit `http://localhost:5173` to access Sincho.
 
 ## Contributing
 
@@ -58,7 +58,7 @@ Sincho is released under the [MIT License](LICENSE).
 
 ## Contact
 
-If you have any questions or feedback regarding Sincho, please feel free to reach out to us at [email@example.com](mailto:email@example.com).
+If you have any questions or feedback regarding Sincho, please feel free to reach out to us at [AdityaMayukhSom](https://www.linkedin.com/in/AdityaMayukhSom).
 
 ---
 
